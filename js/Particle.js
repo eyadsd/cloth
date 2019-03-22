@@ -1,28 +1,24 @@
 class Particle{
     constructor(scene)
     {
-        //this.model = new THREE.Mesh();
-        //this.velocity = new THREE.Vector3();
-        this.acceleration = new THREE.Vector3();
         this.mass = 1;
-        this.force = new THREE.Vector3();
         this.scene = scene;
+        this.acceleration = new THREE.Vector3();
+        this.force = new THREE.Vector3();
         this.velocity = new THREE.Vector3();
+        this.position = new THREE.Vector3();
     }
     update(delta)
     {
-        this.velocity.add(this.acceleration.clone().multiplyScalar(delta))
-        this.model.position.copy(this.model.position.clone().add(this.velocity.clone().multiplyScalar(delta)));
+        this.velocity.add(this.acceleration.clone().multiplyScalar(delta));
+        this.position = this.position.clone().add(this.velocity.clone().multiplyScalar(delta));
         this.acceleration.multiplyScalar(0);
         
     }
     display()
     {
-        var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        var material = new THREE.MeshLambertMaterial( { color: 0x34495E  } );
-        this.model = new THREE.Mesh( geometry, material );
-        this.model.position.set(0,2,0);
-        scene.add(this.model);
+        
+        
     }
 
     addForce(newForce)
@@ -31,10 +27,10 @@ class Particle{
         
     }
     get position(){
-        return this.model.position;
+        return this._position;
     }
     set position(newPosition){
-        this.model.position.copy(newPosition);
+        this._position = newPosition;
     }
     get velocity(){
         return this._velocity;
