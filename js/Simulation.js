@@ -1,4 +1,4 @@
-var scene,camera,renderer,mass,particle1,particle2, particle,mesh;
+var scene,camera,renderer,cloth;
 
 
 function init(){
@@ -22,32 +22,9 @@ function init(){
     var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
     scene.add( light )
 
-  
-
-    particle = new Array(100);
-    for (let index = 0; index < 10; index++) {
-        for (let j = 0; j < 10; j++)
-        {
-            particle[index + 10 * j] = new Particle(scene);
-            particle[index + 10 * j].display();
-            particle[index  + 10* j].position = new THREE.Vector3(j/4,0,(index /4 )-7);
-        }
+    cloth = new Cloth(scene)
 
 
-    }
-    var geometry = new THREE.Geometry();
-    var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-
-    for (let i = 0; i<100; i++)
-    {
-        geometry.vertices.push(particle[i].position)
-    }
-
-
-
-    mesh = new THREE.Line(geometry,material)
-
-    scene.add(mesh)
  }
 
 
@@ -55,41 +32,7 @@ function init(){
 function update()
 {
     let delta = clock.getDelta();
-
-    for (let index = 0; index < 99; index++) {
-        if(index % 10 == 0)
-        {
-            continue;
-        }
-        particle[index].addForce(Fspring(particle[index],particle[index + 1],0.25,10));
-        particle[index].addForce(particle[index].velocity.clone().normalize().multiplyScalar(-0.5));
-        particle[index].addForce(gravity())
-        console.log(particle[index])
-
-
-    }
-    for (let index = 1; index < 99; index++) {
-        if(index % 10 == 0 )
-        {
-            continue;
-        }
-        particle[index].addForce(Fspring(particle[index],particle[index - 1],0.25,10));
-        particle[index].addForce(particle[index].velocity.clone().normalize().multiplyScalar(-0.5));
-        particle[index].addForce(gravity())
-        console.log(particle[index])
-
-
-    }
-
-    for (let index = 0; index < 99; index++) {
-
-        particle[index].update(delta);
-        mesh.geometry.vertices[index] = particle[index].position;
-        mesh.geometry.verticesNeedUpdate = true;
-
-    }
-
-
+    cloth.update(delta)
 
 
 
@@ -109,21 +52,7 @@ var animate = function () {
 init();
 animate();
 
-function Fspring(point , anchor,xRest,K)
-{
 
-    let distanceVector = point.position.clone().sub(anchor.position);
-    let xCurrent = distanceVector.length();
-    let direction = distanceVector.normalize();
-    let stretch = xCurrent - xRest;
-    return  direction.clone().multiplyScalar( -1 *  K * stretch ) ;
-}
-
-function gravity()
-{
-
-    return new THREE.Vector3(0,-2,0)
-}
 function onDocumentMouseDown()
 {
    //particle[1]= particle[1].position.add(new THREE.Vector3(0,0,1))
