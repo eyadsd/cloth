@@ -1,15 +1,15 @@
 class Cloth{
     constructor(scene){
-        this.height = 20;
+        this.height = 30;
         this.width = 30;
         this.particle = new Array(this.height);
-
+		this.K = 120;
         for (let i = 0; i < this.height; i++) {
             this.particle[i] = new Array(this.width)
             for (let j = 0; j < this.width; j++)
             {
                 this.particle[i][j] = new Particle(scene);
-                this.particle[i][j].position = new THREE.Vector3(j/10,0,i/10);
+                this.particle[i][j].position = new THREE.Vector3(j/10,3,i/10-2);
             }
 
 
@@ -69,32 +69,74 @@ class Cloth{
                         if((i == 0 && j==this.width-2)) {
                             continue;
                         }
+						if(i>0 && j>0)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i-1][j-1],0.1,this.K));
 
-                        if(j<this.width - 2)
-                        {
-                            this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j+1],0.1,300));
+						}
+						if(i>0)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i-1][j],0.1,this.K));
 
-                        }
-                        if(i<this.height-2)
-                        {
-                            this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i+1][j],0.1,300));
+						}
+						if(j>0)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j-1],0.1,this.K));
 
-                        }
-                        if(j>0)
-                        {
-                            this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j-1],0.1,300));
+						}
+						if(i<this.height-2&&j<this.width-2)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i+1][j+1],0.1,this.K));
 
-                        }
-                        if(i>0)
-                        {
-                            this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i-1][j],0.1,300));
+						}
+						if(i<this.height-2)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i+1][j],0.1,this.K));
 
-                        }
+						}
+						if(j<this.width-2)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j+1],0.1,this.K));
 
-                        this.particle[i][j].addForce(Forces.gravity())
+						}
+						if(j<this.width-2&&i>0)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i-1][j+1],0.1,this.K));
+
+						}
+						if(i<this.height-2&&j>0)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i+1][j-1],0.1,this.K));
+						}
+						
+						if(i>1)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i-2][j],0.1,this.K/2));
+
+						}
+						if(j>1)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j-2],0.1,this.K/2));
+
+						}
+						
+						if(i<this.height-3)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i+2][j],0.1,this.K/2));
+
+						}
+						if(j<this.width-3)
+						{
+							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j+2],0.1,this.K/2));
+
+						}
+
+                      
+
+                        this.particle[i][j].addForce(Forces.gravity(this.mass))
 
 
-                        this.particle[i][j].addForce(this.particle[i][j].velocity.clone().normalize().multiplyScalar(-0.5));
+                        this.particle[i][j].addForce(this.particle[i][j].velocity.clone().normalize().multiplyScalar(-0.7));
 
                     }
 

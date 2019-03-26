@@ -13,7 +13,7 @@ class Forces{
     static gravity()
     {
 
-        return new THREE.Vector3(0,-1,0)
+        return new THREE.Vector3(0,-2,0)
     }
 
 }

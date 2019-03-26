@@ -38,5 +38,11 @@ class Particle{
     set velocity(newVelocity){
         this._velocity = newVelocity;
     }
-  
+	get mass()
+	{
+	return this._mass
+	}
+	set mass(mass){
+		this._mass = mass
+	}
 }
