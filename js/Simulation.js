@@ -32,7 +32,7 @@ function init(){
 function update()
 {
     let delta = clock.getDelta();
-    cloth.update(delta)
+    cloth.update()
 
 
 

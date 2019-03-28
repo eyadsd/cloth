@@ -7,13 +7,15 @@ class Forces{
         let xCurrent = distanceVector.length();
         let direction = distanceVector.normalize();
         let stretch = xCurrent - xRest;
-        return  direction.clone().multiplyScalar( -1 *  K * stretch ) ;
+				//console.log()
+		
+        return  direction.clone().multiplyScalar( -1 *  K *stretch  ) ;
     }
 
     static gravity()
     {
 
-        return new THREE.Vector3(0,-2,0)
+        return new THREE.Vector3(0,-5,0)
     }
 
 }
