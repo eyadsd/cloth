@@ -12,10 +12,10 @@ class Forces{
         return  direction.clone().multiplyScalar( -1 *  K *stretch  ) ;
     }
 
-    static gravity()
+    static gravity(mass)
     {
 
-        return new THREE.Vector3(0,-5,0)
+        return new THREE.Vector3(0,-4*mass,0)
     }
 
 }
