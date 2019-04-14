@@ -1,5 +1,4 @@
 class Forces{
-
     static Fspring(point , anchor,xRest,K)
     {
 

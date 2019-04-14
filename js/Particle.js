@@ -1,7 +1,7 @@
 class Particle{
     constructor(scene)
     {
-        this.mass = 0.1;
+        this.mass = 0.05;
         this.scene = scene;
         this.acceleration = new THREE.Vector3();
         this.force = new THREE.Vector3();

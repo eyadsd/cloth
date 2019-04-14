@@ -1,10 +1,10 @@
-var scene,camera,renderer,cloth;
+var scene,camera,renderer,cloth,time;
 
 
 function init(){
+	
     clock =  new THREE.Clock;
     clock.start();
-
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );   
     camera.position.z = 5;
@@ -19,21 +19,42 @@ function init(){
    
 
    
-    var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
-    scene.add( light )
+    let  thereBeLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1);
+	//var light = new THREE.DirectionalLight( 0xffffff, 1 );
+	// var light = new THREE.DirectionalLight( 0xdfebff, 1 );
+	// light.position.set( 50, 200, 100 );
+	// light.position.multiplyScalar( 1.3 );
+    scene.add( thereBeLight )
+	//scene.add( new THREE.AmbientLight( 0x666666 ) );
+	textures = new Array(4);
+	let loader = new THREE.TextureLoader();
+	// textures.push(loader.load( "textures/red_cloth.jpg" ));
+	// textures.push(loader.load( "textures/blue_cloth.jpg" ));
+	// textures.push(loader.load( "textures/cloth_texture1.jpg" ));
+	// textures.push(loader.load( "textures/cloth_texture2.png" ));
 	
-    cloth = new Cloth(scene)
+	cloth = new Array(4)
+	for(let i = 0;i<2;i++)
+	{
+		for(let j = 0;j<2;j++)
+	{
+		cloth[i*2+j] = new Cloth(scene,new THREE.Vector3(i*5,0,j*5))
 
-
+	}
+	}
+	
+	
  }
 
 
 
 function update()
 {
-    cloth.update()
+	for(let i = 0;i<4;i++)
+	{
+		cloth[i].update()
 
-
+	}
 
 
 
@@ -54,8 +75,18 @@ animate();
 
 function onDocumentMouseDown()
 {
-   //particle[1]= particle[1].position.add(new THREE.Vector3(0,0,1))
+	//wind = true;
+		//console.log("down")
+		log = true;
+
+}
+function onDocumentMouseUp()
+{
+	//wind = false;
+	//console.log("up")
+	log = false;
 }
 
-
 document.addEventListener('mousedown', onDocumentMouseDown, false);
+document.addEventListener('mouseup', onDocumentMouseUp, false);
+
