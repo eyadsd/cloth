@@ -33,16 +33,18 @@ function init(){
 	// textures.push(loader.load( "textures/cloth_texture1.jpg" ));
 	// textures.push(loader.load( "textures/cloth_texture2.png" ));
 	
-	cloth = new Array(4)
-	for(let i = 0;i<2;i++)
-	{
-		for(let j = 0;j<2;j++)
-	{
-		cloth[i*2+j] = new Cloth(scene,new THREE.Vector3(i*5,0,j*5))
+	// cloth = new Array(4)
+	// for(let i = 0;i<2;i++)
+	// {
+	// 	for(let j = 0;j<2;j++)
+	// {
+	// 	cloth[i*2+j] = new Cloth(scene,new THREE.Vector3(i*5,0,j*5))
 
-	}
-	}
-	
+	// }
+	// }
+
+	cloth = new Cloth(scene,new THREE.Vector3(0,0,0))
+
 	
  }
 
@@ -50,12 +52,7 @@ function init(){
 
 function update()
 {
-	for(let i = 0;i<4;i++)
-	{
-		cloth[i].update()
-
-	}
-
+	cloth.update()
 
 
 }
@@ -77,14 +74,13 @@ function onDocumentMouseDown()
 {
 	//wind = true;
 		//console.log("down")
-		log = true;
-
+		noForces = true;
 }
 function onDocumentMouseUp()
 {
 	//wind = false;
 	//console.log("up")
-	log = false;
+	noForces = false;
 }
 
 document.addEventListener('mousedown', onDocumentMouseDown, false);
