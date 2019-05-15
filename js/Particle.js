@@ -7,13 +7,18 @@ class Particle{
         this.force = new THREE.Vector3();
         this.velocity = new THREE.Vector3();
         this.position = new THREE.Vector3();
+        this.fixed = false
     }
     update()
     {
-		let delta = 1/60
-        this.velocity.add(this.acceleration.clone().multiplyScalar(delta));
-        this.position = this.position.clone().add(this.velocity.clone().multiplyScalar(delta));
-        this.acceleration.multiplyScalar(0);
+        if(!this.fixed)
+        {
+            let delta = 1/120
+            this.velocity.add(this.acceleration.clone().multiplyScalar(delta));
+            this.position.add(this.velocity.clone().multiplyScalar(delta));
+            this.acceleration.multiplyScalar(0);
+       }
+		
         
     }
     display()
@@ -36,6 +41,14 @@ class Particle{
     }
     set position(newPosition){
         this._position = newPosition;
+        
+    }
+    addPosition(vector)
+    {
+        if(!this.fixed)
+        {
+            this.position.add(vector)
+        }
     }
     get velocity(){
         return this._velocity;
@@ -49,5 +62,11 @@ class Particle{
 	}
 	set mass(mass){
 		this._mass = mass
-	}
+    }
+    set fixed(fixed){
+        this._fixed = fixed
+    }
+    get fixed(){
+        return this._fixed
+    }
 }

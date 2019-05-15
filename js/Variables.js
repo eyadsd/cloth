@@ -1,6 +1,7 @@
-let wind = true;
+let wind = false;
 let log = false;
-let xWindStrength = 0.3;
-let zWindStrength = 0.3;
+let xWindStrength = 0.1;
+let zWindStrength = 0.1;
 let yWindStrength = 0;
 let noForces = false;
+let sphereCenter = new THREE.Vector3(0,0,0)

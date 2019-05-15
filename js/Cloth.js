@@ -2,22 +2,30 @@ class Cloth{
     constructor(scene,position){
         this.height = 25;
         this.width = 25;
-        this.particle = new Array(this.height);
+		this.particle = new Array(this.height);
+		this.springs = []
 		this.xRest = 0.1;
 		this.K = 50;
 		this.time = 0;
 		this.deformationRate = this.xRest*2;
+
         for (let i = 0; i < this.height; i++) {
             this.particle[i] = new Array(this.width)
             for (let j = 0; j < this.width; j++)
             {
                 this.particle[i][j] = new Particle(scene);
-                this.particle[i][j].position = new THREE.Vector3(j*this.xRest-this.xRest*(this.width/2),1,i*this.xRest).add(position);
+				this.particle[i][j].position = new THREE.Vector3(j*this.xRest-this.xRest*(this.width/2),1,i*this.xRest).add(position);
+				
             }
 
 
-        }
+		}
 		this.diagonalDistance = this.particle[0][0].position.distanceTo(this.particle[1][1].position) 
+		console.log(this.diagonalDistance)
+
+		this.addSprings()
+		this.particle[0][0].fixed = true
+		this.particle[0][this.width-1].fixed = true
 
         var geometry = new THREE.Geometry();
 
@@ -63,8 +71,6 @@ class Cloth{
 		}
 		geometry.uvsNeedUpdate = true;
 		this.texture = new THREE.TextureLoader().load( "textures/cloth_texture_3.jpg" );
-		//this.texture.anisotropy = 16
-		//texture.mapping = THREE.ClampToEdgeWrapping;
 		 var material = new THREE.MeshLambertMaterial({map:this.texture, 
 		 side:THREE.DoubleSide });
 		 
@@ -77,201 +83,140 @@ class Cloth{
 		
 		scene.add(this.mesh)
 		
-					
+		var geometry = new THREE.SphereGeometry(0.45, 32, 32);
+		var material = new THREE.MeshLambertMaterial( {color: 0x0000ff} );
+
+		this.sphere = new THREE.Mesh( geometry, material );
+		scene.add( this.sphere );
 					
 			
 		
     }
     update(){
-			
-		
-			
+		this.sphere.position.setX(sphereCenter.x)
+		this.sphere.position.setZ(sphereCenter.z)
 		this.calculateForces()
-            for (let i = 0; i < this.height; i++) {
-                for (let j = 0; j < this.width; j++) {
-                    {
+           
+			
+			for(let k = 0; k < 50 ; k++)
+			{	
+				for(let i = 0; i<this.springs.length;i++)
+				{
+					let limit = this.xRest + this.xRest/10
+					let diagonalLimit = Math.sqrt(Math.pow(limit,2)*2)
+					let bendingLimit = this.xRest*2 + this.xRest*2/10
+					if(this.springs[i].type == "structural")
+					{
+						let distance = this.springs[i].point1.position.clone().sub(this.springs[i].point2.position).length()
+						if(distance>limit){
+								this.adjust(this.springs[i].point1,this.springs[i].point2,distance,limit)
+						}
+						
+					}
+					if(this.springs[i].type == "shear"){
+						let distance = this.springs[i].point1.position.clone().sub(this.springs[i].point2.position).length()
+						if(distance>diagonalLimit){
+							this.adjust(this.springs[i].point1,this.springs[i].point2,distance,diagonalLimit)
+						}
+					}
+				
+					
+				}
 
-                        this.particle[i][j].update();
-                        this.mesh.geometry.vertices[i * this.width + j] = this.particle[i][j].position;
-                        
-
-                    }
-                }
 			}
 			
-			
-			this.mesh.geometry.computeFaceNormals();
-			this.mesh.geometry.computeVertexNormals();
-
-			this.mesh.geometry.verticesNeedUpdate = true;
-			this.mesh.geometry.elementsNeedUpdate = true;
-			this.mesh.geometry.normalsNeedUpdate = true
-			
-			
-			for (let i =0; i < this.height; i++)
+				
+			for (let i = 0; i < this.height; i++)
 				{
                 for (let j = 0; j <this.width; j++)
                     {
-						let limit = this.xRest+this.xRest/10;
-						
-						// if(i<this.height-1)
-						// {
-							 // if(i+1==this.height-1 && j==0)
-							 // {continue}
-						
-							// let point1 = this.particle[i][j].position
-							// let point2 = this.particle[i+1][j].position
-							// let distance = point1.distanceTo(point2)
-							// if(distance>limit){
-								// this.particle[i+1][j].position = this.adjust(point1,point2,limit)
-							// }
+
+						let radius = 0.5
+						let position = new THREE.Vector3(-1,-1,1)
+						position = sphereCenter
+						let distanceVector = this.particle[i][j].position.clone().sub(position)
+						let direction = distanceVector.clone().normalize()
+						let distance =  this.particle[i][j].position.distanceTo(position)
+						let velocity = this.particle[i][j].velocity
+						if( distance < radius){
+							let newposition = direction.clone().multiplyScalar(radius).add(position)
+							this.particle[i][j].position = newposition
+							let vn = velocity.clone().multiplyScalar(direction.clone().dot(velocity))
+							this.particle[i][j].velocity = vn.multiplyScalar(0.1)
 							
-						// }
-						// if(j<this.width-1)
-						// {
-							
-							// let point1 = this.particle[i][j].position
-							// let point2 = this.particle[i][j+1].position
-							// let distance = point1.distanceTo(point2)
-							// if(distance>limit){
-								// this.particle[i][j+1].position = this.adjust(point1,point2,limit)
-							// }
-							
-						// }
-						// if(i>0)
-						// {
-							// let point1 = this.particle[i][j].position
-							// let point2 = this.particle[i-1][j].position
-							// let distance = point1.distanceTo(point2)
-							// if(distance>limit){
-								// this.particle[i-1][j].position = this.adjust(point1,point2,limit)
-							// }
-							
-						// }
-						// if(j>0)
-						// {
-							// let point1 = this.particle[i][j].position
-							// let point2 = this.particle[i][j-1].position
-							// let distance = point1.distanceTo(point2)
-							// if(distance>limit){
-								// this.particle[i][j-1].position = this.adjust(point1,point2,limit)
-							// }
-							
-						// }
+						 }
 						
 						
                     }
 
 				}
+				
+				this.mesh.geometry.computeFaceNormals();
+				this.mesh.geometry.computeVertexNormals();
+	
+				this.mesh.geometry.verticesNeedUpdate = true;
+				this.mesh.geometry.elementsNeedUpdate = true;
+				this.mesh.geometry.normalsNeedUpdate = true;
 			
+				for (let i = 0; i < this.height; i++) {
+					for (let j = 0; j < this.width; j++) {
+						{
+							this.particle[i][j].update();
+							this.mesh.geometry.vertices[i * this.width + j] = this.particle[i][j].position;
+							
+						}
+					}
+				}
     }
 	
-	adjust(point1,point2,limit)
+	adjust(point1,point2,distance,limit)
 	{
-		let distanceVector = point2.clone().sub(point1).normalize()
-		distanceVector.setLength(limit)
-		let newPosition = point1.clone().add(distanceVector)
-		return newPosition
+		let point1topoint2 = point2.position.clone().sub(point1.position).normalize()
+		let point2topoint1 = point1.position.clone().sub(point2.position).normalize()
+		let diff = distance - limit
+		point1topoint2.multiplyScalar(diff/2)
+		point2topoint1.multiplyScalar(diff/2)
+
+		point1.addPosition(point1topoint2)
+		point2.addPosition(point2topoint1)
+
+
 	}
-	
+
 	
 	calculateForces()
 	{
+		for (let i = 0; i < this.springs.length; i++)
+		{
+			if(this.springs[i].type == "structural")
+			{
+				this.springs[i].point1.addForce(Forces.Fspring(this.springs[i].point1,this.springs[i].point2,this.xRest,this.K))
+				this.springs[i].point2.addForce(Forces.Fspring(this.springs[i].point2,this.springs[i].point1,this.xRest,this.K))
+
+			}
+			if(this.springs[i].type == "shear")
+			{
+				this.springs[i].point1.addForce(Forces.Fspring(this.springs[i].point1,this.springs[i].point2,this.diagonalDistance,this.K))
+				this.springs[i].point2.addForce(Forces.Fspring(this.springs[i].point2,this.springs[i].point1,this.diagonalDistance,this.K))
+				
+			}
+			if(this.springs[i].type == "bending")
+			{
+				this.springs[i].point1.addForce(Forces.Fspring(this.springs[i].point1,this.springs[i].point2,this.xRest*2,this.K/3))
+				this.springs[i].point2.addForce(Forces.Fspring(this.springs[i].point2,this.springs[i].point1,this.xRest*2,this.K/3))
+			}
+		}
 		let xOff = 0; 
             for (let i = 0; i < this.height; i++) {
 				
 				let yOff = 0;
                 for (let j = 0; j < this.width; j++)
                     {
-						
-                        // if(i == 0 && j==0) {
-                            // continue;
-                        // }
-					  
-                        // if((j == 0 && i==this.height-1)) {
-                           // continue;
-                        // }
-					  
-						 if( j==0) {
-         					continue;
-                        }
-						
-						//shear springs
-						if(i>0 && j>0)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i-1][j-1],this.diagonalDistance,this.K));
-
-						}
-						if(i<this.height-1&&j<this.width-1)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i+1][j+1],this.diagonalDistance,this.K));
-
-						}
-						if(j<this.width-1&&i>0)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i-1][j+1],this.diagonalDistance,this.K));
-
-						}
-						if(i<this.height-1&&j>0)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i+1][j-1],this.diagonalDistance,this.K));
-						}
-						
-						
-						//structural springs
-						if(i>0)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i-1][j],this.xRest,this.K));
-
-						}
-						if(j>0)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j-1],this.xRest,this.K));
-
-						}
-						
-						if(i<this.height-1)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i+1][j],this.xRest,this.K));
-
-						}
-						if(j<this.width-1)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j+1],this.xRest,this.K));
-
-						}
-						
-						
-						
-						// bending springs
-						if(i>1)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i-2][j],this.xRest*2,this.K/3));
-
-						}
-						if(j>1)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j-2],this.xRest*2,this.K/3));
-
-						}
-						
-						if(i<this.height-2)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i+2][j],this.xRest*2,this.K/3));
-
-						}
-						if(j<this.width-2)
-						{
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j],this.particle[i][j+2],this.xRest*2,this.K/3));
-
-						}
-
-                      
-						// drag force	
+						// gravity force	
                         this.particle[i][j].addForce(Forces.gravity(this.particle[i][j].mass))
 
 						//drag force	
-                        this.particle[i][j].addForce(this.particle[i][j].velocity.clone().normalize().multiplyScalar(-0.05));
+                        this.particle[i][j].addForce(this.particle[i][j].velocity.clone().normalize().multiplyScalar(-0.1));
 						
 						if(wind == true)
 						{
@@ -292,4 +237,61 @@ class Cloth{
 				}
 			this.time += 0.01;
 	}
+	addSprings(){
+		for (let i = 0; i < this.height; i++) {
+				
+			for (let j = 0; j < this.width; j++)
+				{
+					
+					if(i<this.height-1&&j<this.width-1)
+					{
+						this.springs.push(new Spring(this.particle[i][j],this.particle[i+1][j+1],"shear"));
+
+					}
+					if(j<this.width-1&&i>0)
+					{
+						this.springs.push(new Spring(this.particle[i][j],this.particle[i-1][j+1],"shear"));
+
+					}
+					
+					
+					if(i<this.height-1)
+					{
+						this.springs.push(new Spring(this.particle[i][j],this.particle[i+1][j],"structural"));
+
+					}
+					if(j<this.width-1)
+					{
+						this.springs.push(new Spring(this.particle[i][j],this.particle[i][j+1],"structural"));
+
+					}
+					
+					
+					
+					// bending springs
+					// if(i>1)
+					// {
+					// 	this.springs.push(new Spring(this.particle[i][j],this.particle[i-2][j],"bending"));
+
+					// }
+					// if(j>1)
+					// {
+					// 	this.springs.push(new Spring(this.particle[i][j],this.particle[i][j-2],"bending"));
+
+					// }
+					
+					if(i<this.height-2)
+					{
+						this.springs.push(new Spring(this.particle[i][j],this.particle[i+2][j],"bending"));
+
+					}
+					if(j<this.width-2)
+					{
+						this.springs.push(new Spring(this.particle[i][j],this.particle[i][j+2],"bending"));
+
+					}
+				}
+			}
+	}
+
 }

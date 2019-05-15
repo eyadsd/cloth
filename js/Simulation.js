@@ -69,20 +69,39 @@ var animate = function () {
 init();
 animate();
 
-
 function onDocumentMouseDown()
 {
-	//wind = true;
-		//console.log("down")
-		noForces = true;
+	
 }
 function onDocumentMouseUp()
 {
-	//wind = false;
-	//console.log("up")
-	noForces = false;
+	
 }
 
 document.addEventListener('mousedown', onDocumentMouseDown, false);
 document.addEventListener('mouseup', onDocumentMouseUp, false);
-
+document.addEventListener("keydown", function (event) {
+	if (event.defaultPrevented) {
+	  return; // Do nothing if the event was already processed
+	}
+  
+	switch (event.key) {
+	  case "ArrowDown":
+	  	sphereCenter.add(new THREE.Vector3(0,0,-0.05))
+	  break;
+	  case "ArrowUp":
+	 	 sphereCenter.add(new THREE.Vector3(0,0,0.05))
+	  break;
+	  case "ArrowLeft":
+	 	 sphereCenter.add(new THREE.Vector3(-0.05,0,0))
+	  break;
+	  case "ArrowRight":
+	  	sphereCenter.add(new THREE.Vector3(0.05,0,0))
+	  break;
+	  default:
+		return; // Quit when this doesn't handle the key event.
+	}
+  
+	// Cancel the default action to avoid it being handled twice
+	event.preventDefault();
+  }, true);
