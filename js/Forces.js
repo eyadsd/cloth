@@ -1,8 +1,7 @@
 class Forces{
     static Fspring(point , anchor,xRest,K)
     {
-
-        let distanceVector = point.position.clone().sub(anchor.position);
+        let distanceVector = point.clone().sub(anchor);
         let xCurrent = distanceVector.length();
         let direction = distanceVector.normalize();
         let stretch = xCurrent - xRest;
@@ -14,7 +13,7 @@ class Forces{
     static gravity(mass)
     {
 
-        return new THREE.Vector3(0,-4*mass,0)
+        return new THREE.Vector3(0,-GRAVITY_STRENGTH*mass,0)
     }
 
 }

@@ -8,17 +8,42 @@
 
 </head>
 <body>
+    <script type="x-shader/x-vertex" id="vertexShader">
+			varying vec3 vWorldPosition;
+			void main() {
+				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+				vWorldPosition = worldPosition.xyz;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			}
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentShader">
+			uniform vec3 topColor;
+			uniform vec3 bottomColor;
+			uniform float offset;
+			uniform float exponent;
+			varying vec3 vWorldPosition;
+			void main() {
+				float h = normalize( vWorldPosition + offset ).y;
+				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
+			}
+		</script>
 <div id="container"></div>
+<script src="js/dat.gui.js"></script>
 <script src="js/three.js"></script>
+<script src="js/OBJLoader.js"></script>
 <script src="js/perlin.js"></script>
 <script src="js/Utils.js"></script>
 <script src="js/Variables.js"></script>
 <script src="js/OrbitControls.js"></script>
 <script src="js/Spring.js"></script>
 <script src="js/Cloth.js"></script>
+<script src="js/Sheet.js"></script>
+<script src="js/Sleeve.js"></script>
 <script src="js/Forces.js"></script>
 <script src="js/Particle.js"></script>
 <script src="js/Simulation.js"></script>
+<script src="js/gui.js"></script>
 
 
 

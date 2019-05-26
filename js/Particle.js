@@ -4,32 +4,36 @@ class Particle{
         this.mass = 0.05;
         this.scene = scene;
         this.acceleration = new THREE.Vector3();
-        this.force = new THREE.Vector3();
         this.velocity = new THREE.Vector3();
         this.position = new THREE.Vector3();
+        this.previousPosition = this.position.clone();
         this.fixed = false
     }
-    update()
+    update(timestep)
     {
         if(!this.fixed)
         {
-            let delta = 1/120
-            this.velocity.add(this.acceleration.clone().multiplyScalar(delta));
-            this.position.add(this.velocity.clone().multiplyScalar(delta));
+            this.previousPosition = this.position.clone()
+            this.velocity.add(this.acceleration.clone().multiplyScalar(timestep));
+            this.position.add(this.velocity.clone().multiplyScalar(timestep));
             this.acceleration.multiplyScalar(0);
+          
        }
 		
         
     }
-    display()
-    {
-        
-        
+
+    clone(){
+        let newObject = new Particle(this.scene)
+        newObject.velocity = this.velocity.clone()
+        newObject.position = this.position.clone()
+        newObject.fixed = this.fixed 
+        return newObject
     }
 
     addForce(newForce)
     {
-        this.acceleration.add(newForce.multiplyScalar(1/this.mass));
+        this.acceleration.add(newForce.clone().multiplyScalar(1/this.mass));
         
     }
 	addGravity()
@@ -39,9 +43,14 @@ class Particle{
     get position(){
         return this._position;
     }
-    set position(newPosition){
-        this._position = newPosition;
-        
+    set position(position){
+        this._position = position;
+    }
+    get previousPosition(){
+        return this._previousPosition;
+    }
+    set previousPosition(previousPosition){
+        this._previousPosition = previousPosition;
     }
     addPosition(vector)
     {
@@ -53,8 +62,14 @@ class Particle{
     get velocity(){
         return this._velocity;
     }
-    set velocity(newVelocity){
-        this._velocity = newVelocity;
+    set velocity(velocity){
+        this._velocity = velocity;
+    }
+    get acceleration(){
+        return this._acceleration;
+    }
+    set acceleration(acceleration){
+        this._acceleration = acceleration;
     }
 	get mass()
 	{

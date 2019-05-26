@@ -16,6 +16,9 @@ var obj = {
   timestep:80,
   windObj:false,
   constraintIterationsObj:40,
+  deformationConstraint:false,
+  kObj:40,
+  massObj:0.05,
   // reset: function(){
   //   cloth.reset()
   // },
@@ -84,19 +87,38 @@ gui.add(obj, 'yWindStrengthObj').min(-1).max(1).step(0.1).name("Y wind").onChang
   yWindStrength = obj.yWindStrengthObj;
 });
 
-gui.add(obj, 'deformationRateObj').min(0.05).max(1).step(0.05).name("deformation rate").onChange(function(){
-  cloth.deformationRate = obj.deformationRateObj;
+gui.add(obj, 'deformationConstraint').name("deformation constraint").onChange(function(){
+  cloth.deformationConstraint = obj.deformationConstraint;
 });
 
-gui.add(obj, 'gravityStrengthObj').min(0).max(10).step(0.01).name("gravity").onChange(function(){
-  GRAVITY_STRENGTH = obj.gravityStrengthObj;
+gui.add(obj, 'deformationRateObj').min(0.05).max(1).step(0.05).name("deformation rate").onChange(function(){
+  cloth.deformationRate = obj.deformationRateObj;
 });
 gui.add(obj, 'constraintIterationsObj').min(10).max(100).step(1).name("constraint iterations").onChange(function(){
   cloth.constraintIterations = obj.constraintIterationsObj;
 });
-gui.add(obj, 'timestep').min(60).max(200).step(1).name("1/timestep").onChange(function(){
+gui.add(obj, 'kObj').min(10).max(400).step(1).name("K").onChange(function(){
+  cloth.K = obj.kObj;
+});
+gui.add(obj, 'gravityStrengthObj').min(0).max(10).step(0.01).name("gravity").onChange(function(){
+  GRAVITY_STRENGTH = obj.gravityStrengthObj;
+});
+gui.add(obj, 'massObj').min(0.01).max(5).step(0.001).name("mass").onChange(function(){
+  for(let i = 0;i<cloth.height;i++)
+  {
+    for(let j = 0;j<cloth.width;j++)
+    {
+      cloth.particle[i][j].mass = obj.massObj
+    }
+  }
+});
+gui.add(obj, 'timestep').min(30).max(300).step(1).name("1/timestep").onChange(function(){
   timestep = 1/obj.timestep;
 });
+gui.add(obj, 'adaptiveTimestepObj').name("adaptive timestep").onChange(function(){
+  adaptiveTimestep = obj.adaptiveTimestepObj
+});
+
 gui.add(obj, 'windObj').name("wind").onChange(function(){
   wind = obj.windObj
 });

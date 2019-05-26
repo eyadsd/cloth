@@ -537,42 +537,42 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleKeyDown( event ) {
 
-		// console.log( 'handleKeyDown' );
+		console.log( 'handleKeyDown' );
 
 		var needsUpdate = false;
 
-		switch ( event.keyCode ) {
+		// switch ( event.keyCode ) {
 
-			case scope.keys.UP:
-				pan( 0, scope.keyPanSpeed );
-				needsUpdate = true;
-				break;
+		// 	case scope.keys.UP:
+		// 		pan( 0, scope.keyPanSpeed );
+		// 		needsUpdate = true;
+		// 		break;
 
-			case scope.keys.BOTTOM:
-				pan( 0, - scope.keyPanSpeed );
-				needsUpdate = true;
-				break;
+		// 	case scope.keys.BOTTOM:
+		// 		pan( 0, - scope.keyPanSpeed );
+		// 		needsUpdate = true;
+		// 		break;
 
-			case scope.keys.LEFT:
-				pan( scope.keyPanSpeed, 0 );
-				needsUpdate = true;
-				break;
+		// 	case scope.keys.LEFT:
+		// 		pan( scope.keyPanSpeed, 0 );
+		// 		needsUpdate = true;
+		// 		break;
 
-			case scope.keys.RIGHT:
-				pan( - scope.keyPanSpeed, 0 );
-				needsUpdate = true;
-				break;
+		// 	case scope.keys.RIGHT:
+		// 		pan( - scope.keyPanSpeed, 0 );
+		// 		needsUpdate = true;
+		// 		break;
 
-		}
+		// }
 
-		if ( needsUpdate ) {
+		// if ( needsUpdate ) {
 
-			// prevent the browser from scrolling on cursor keys
-			event.preventDefault();
+		// 	// prevent the browser from scrolling on cursor keys
+		// 	event.preventDefault();
 
-			scope.update();
+		// 	scope.update();
 
-		}
+		// }
 
 
 	}
