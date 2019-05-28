@@ -33,7 +33,7 @@ function init(){
 	mesh.position.y = - 5;
 	mesh.rotation.x = - Math.PI / 2;
 	mesh.receiveShadow = true;
-	//scene.add( mesh );
+	scene.add( mesh );
 
 
 
@@ -46,7 +46,7 @@ function init(){
 let adaptiveTimestep = false
 let timestep = TIME_STEP
 let accumulator = 0
-let epsilom =0.5
+let epsilom =2
 function update()
 {
 	accumulator +=	clock.getDelta()
@@ -54,14 +54,16 @@ function update()
 	{					
 
 			accumulator-=timestep
-			// if(adaptiveTimestep == true)
-			// {
+			cloth.update(timestep)
+
+			// //if(adaptiveTimestep == true)
+			// //{
 			// cloth2 = cloth.clone()
 			// cloth2.update(timestep)
 			// let diff = cloth2.diff
+			// console.log(diff)
 			// if(diff>epsilom)
 			// {
-			// 	//console.log(diff)
 			// 	while(diff>epsilom)
 			// 	{
 			// 		timestep = timestep/2
@@ -77,11 +79,7 @@ function update()
 			// 	cloth.update(timestep)
 			// 	//timestep = timestep * 2
 			// }
-			// console.log(diff)
-			// }
-		    // else{
-				cloth.update(timestep)
-			//}
+			// //}
 	}
 	
 }

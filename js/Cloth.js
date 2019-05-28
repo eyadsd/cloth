@@ -5,12 +5,12 @@ class Cloth{
 		this.particle = new Array(this.height);
 		this.springs = []
 		this.xRest = 0.1;
-		this.K = 40;
+		this.K = 50;
 		this.time = 0;
 		this.deformationRate = 0.1;
 		this.position = position.clone()
 		this.constraintIterations = 50
-		this.deformationConstraint = false
+		this.deformationConstraint = true;
 		this.raycaster = new THREE.Raycaster();
 
 
@@ -114,22 +114,22 @@ class Cloth{
 		}
 		
 		
-		//let maxDiff = 0
+		// let maxDiff = 0
 		for (let i = 0; i < this.height; i++) {
 			
 			for (let j = 0; j < this.width; j++) {
 			
 				this.particle[i][j].update(timestep)
 			
-			//let diff = 	this.particle[i][j].velocity.length() * timestep
+			// let diff = 	this.particle[i][j].velocity.length() * this.particle[i][j].mass
 			// if(diff>maxDiff)
 			// {
 			// 	maxDiff = diff
 			// }
-			//console.log(this.particle[i][j].velocity)
+			// maxDiff += diff
 			}
 		}
-		//this.diff = maxDiff
+		// this.diff = maxDiff
 	}
 	// Response(particle,normal,distance){
 	// 	let direction = normal
@@ -153,9 +153,10 @@ class Cloth{
 			for (let j = 0; j < this.width; j++) {
 				
 					this.mesh.geometry.vertices[i * this.width + j] = this.particle[i][j].position;
-					if(this.particle[i][j].position.y < -4.9)
+
+					if(this.particle[i][j].position.y < planePosition)
 					{
-						this.particle[i][j].position.setY(-4.9)
+						this.particle[i][j].position.setY(planePosition)
 						let direction = new THREE.Vector3(0, 1, 0)
 						let vn = direction.clone().multiplyScalar(direction.clone().dot(this.particle[i][j].velocity))
 		 				let vt =this.particle[i][j].velocity.clone().sub(vn)
@@ -233,8 +234,8 @@ class Cloth{
 
 							//mapping the value of simplex3 from -1 1 to [0,windStrength]
 							xWind = Utils.map(xWind,-1,1,-xWindStrength,xWindStrength)
-							zWind = Utils.map(zWind,-1,1,-yWindStrength,zWindStrength)
-							yWind = Utils.map(yWind,-1,1,-zWindStrength,yWindStrength)
+							zWind = Utils.map(zWind,-1,1,-zWindStrength,zWindStrength)
+							yWind = Utils.map(yWind,-1,1,-yWindStrength,yWindStrength)
 							this.particle[i][j].addForce(new THREE.Vector3(xWind,yWind,zWind))
 
 						}
@@ -348,11 +349,7 @@ class Cloth{
 		scene.add(this.mesh)
 		
 	
-		
-
-		
-
-		
+			
 		}
 	clone(){
 		let newCloth = new Cloth(this.position)
