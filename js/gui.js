@@ -57,10 +57,10 @@ var obj = {
   yWindStrengthObj: 0,
   deformationRateObj: 0.1,
   gravityStrengthObj:4,
-  timestep:1/TIME_STEP,
+  timestep:140,
   windObj:false,
   constraintIterationsObj:40,
-  deformationConstraint:true,
+  deformationConstraint:false,
   kObj:40,
   massObj:0.05,
   dragObj:0.1,
@@ -77,9 +77,6 @@ var obj = {
 		},
   scenario2Obj:function(){
     clearScene()
-    cloth.reset()
-    cloth.particle[0][0].fixed = true
-    cloth.particle[0][cloth.width-1].fixed = true
     var material = new THREE.MeshLambertMaterial( {color: 0x00ff00} );
 		let radius = 0.6;
 		const tubeRadius = 0.2;
@@ -96,47 +93,35 @@ var obj = {
   },
   scenario3Obj:function(){
     clearScene()
-    cloth.reset()
-    cloth.particle[0][0].fixed = true
-    cloth.particle[0][cloth.width-1].fixed = true
-    const radius = 3.5;
-    const tube = 1.5;
-    const radialSegments = 6;
-    const tubularSegments = 20;
-    const p = 2;
-    const q = 3;
-    const geometry = new THREE.TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q);
+    const heart = new THREE.Shape();
+    const x = -2.5;
+    const y = -5;
+    heart.moveTo(x + 2.5, y + 2.5);
+    heart.bezierCurveTo(x + 2.5, y + 2.5, x + 2, y, x, y);
+    heart.bezierCurveTo(x - 3, y, x - 3, y + 3.5, x - 3, y + 3.5);
+    heart.bezierCurveTo(x - 3, y + 5.5, x - 1.5, y + 7.7, x + 2.5, y + 9.5);
+    heart.bezierCurveTo(x + 6, y + 7.7, x + 8, y + 4.5, x + 8, y + 3.5);
+    heart.bezierCurveTo(x + 8, y + 3.5, x + 8, y, x + 5, y);
+    heart.bezierCurveTo(x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5);
+
+    const extrudeSettings = {
+      steps: 2,
+      depth: 2,
+      bevelEnabled: true,
+      bevelThickness: 1,
+      bevelSize: 1,
+      bevelSegments: 2,
+    };
     var material = new THREE.MeshLambertMaterial( {color: 0x00ff00} );
+    let geometry = new THREE.ExtrudeBufferGeometry(heart, extrudeSettings);
     shape = new THREE.Mesh(geometry,material)
-		//shape.rotation.x = Math.PI / 2;
+		shape.rotation.x = Math.PI / 2;
     shape.userData = { keepMe: true };
     shapePosition.set(0,0,1.5)
     shape.scale.set(0.1,0.1,0.1)
     scene.add(shape)
-    timestep = 1/130
+    timestep = 1/140
     cloth.deformationConstraint = false
-  },
-  scenario4Obj:function(){
-    clearScene();
-    cloth.reset()
-    cloth.particle[0][0].fixed = true
-    cloth.particle[0][cloth.width-1].fixed = true
-    const radiusTop = 4;
-    const radiusBottom = 4;
-    const height = 28;
-    const radialSegments = 12;
-    const geometry = new THREE.CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments);
-    var material = new THREE.MeshLambertMaterial( {color: 0x00ff00} );
-    shape = new THREE.Mesh(geometry,material)
-    shape.userData = { keepMe: true };
-    shape.rotation.x = Math.PI / 2;
-
-    shapePosition.set(0.6,0,1)
-    shape.scale.set(0.1,0.1,0.1)
-    scene.add(shape)
-    timestep = 1/130
-    cloth.deformationConstraint = false
-
   }
 };
 
@@ -198,7 +183,7 @@ gui.add(obj, 'massObj').min(0.01).max(1).step(0.001).name("mass").onChange(funct
 gui.add(obj, 'dragObj').min(0).max(1).step(0.01).name("drag").onChange(function(){
   DRAG = obj.dragObj;
 });
-gui.add(obj, 'timestep').min(60).max(300).step(1).name("1/timestep").onChange(function(){
+gui.add(obj, 'timestep').min(30).max(300).step(1).name("1/timestep").onChange(function(){
   timestep = 1/obj.timestep;
 });
 gui.add(obj, 'wireframeObj').name("wireframe").onChange(function(){
@@ -207,12 +192,13 @@ gui.add(obj, 'wireframeObj').name("wireframe").onChange(function(){
 
 gui.add(obj, 'windObj').name("wind").onChange(function(){
   wind = obj.windObj
+  clearScene()
 });
 var f1 = gui.addFolder('scenarios');
 f1.add(obj, 'scenario1Obj');
 f1.add(obj, 'scenario2Obj');
 f1.add(obj, 'scenario3Obj');
-f1.add(obj, 'scenario4Obj');
+
 
 function setChecked( prop ){
 	for (let param in obj){
