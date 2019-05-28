@@ -1,18 +1,5 @@
-var scene,camera,renderer,cloth,time,cloth2;
-// var loader = new THREE.OBJLoader();
-// let human = new THREE.Mesh()
-// // load a resource
-// loader.load(
-// 	// resource URL
-// 	'FinalBaseMesh.obj',
-// 	// called when resource is loaded
-// 	function ( object ) {
-// 		object.scale.set(0.2,0.2,0.2)
-// 		object.position.set(0,-5,1)
-// 		scene.add(object)
-// 		human = object.children[0]
-// 		console.log(human)
-// 	},)
+var scene,camera,renderer,cloth,time,cloth2,shape;
+
 function init(){
 	
 	clock =  new THREE.Clock;
@@ -30,48 +17,25 @@ function init(){
 
 	let  thereBeLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1);
 	scene.add( thereBeLight )
-	//   hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
-	//   hemiLight.color.setHSL( 0.6, 1, 0.6 );
-	//   hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-	//   hemiLight.position.set( 0, 50, 0 );
-	//   scene.add( hemiLight );
 
 
 	scene.background = new THREE.Color( 0xcce0ff );
 	scene.fog = new THREE.Fog( 0xcce0ff, 500, 2000 );
 
 	var loader = new THREE.TextureLoader();
-	var groundTexture = loader.load( 'textures/floor6.jpg' );
+	var groundTexture = loader.load( 'textures/floor9.jpg' );
 	groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-	groundTexture.repeat.set( 250, 250 );
+	groundTexture.repeat.set( 50, 50 );
 	groundTexture.anisotropy = 16;
 	var groundMaterial = new THREE.MeshLambertMaterial( { map: groundTexture } );
-	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), groundMaterial );
+	//var groundMaterial = new THREE.MeshLambertMaterial( { color: 0x2F4F4F} );
+	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 300, 300 ), groundMaterial );
 	mesh.position.y = - 5;
 	mesh.rotation.x = - Math.PI / 2;
 	mesh.receiveShadow = true;
-	scene.add( mesh );
+	//scene.add( mesh );
 
 
-//   var vertexShader = document.getElementById( 'vertexShader' ).textContent;
-//   var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
-//   var uniforms = {
-// 	  "topColor": { value: new THREE.Color( 0x0077ff ) },
-// 	  "bottomColor": { value: new THREE.Color( 0xffffff ) },
-// 	  "offset": { value: 33 },
-// 	  "exponent": { value: 0.6 }
-//   };
-//   uniforms[ "topColor" ].value.copy( hemiLight.color );
-//   scene.fog.color.copy( uniforms[ "bottomColor" ].value );
-//   var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
-//   var skyMat = new THREE.ShaderMaterial( {
-// 	  uniforms: uniforms,
-// 	  vertexShader: vertexShader,
-// 	  fragmentShader: fragmentShader,
-// 	  side: THREE.BackSide
-//   } );
-//   var sky = new THREE.Mesh( skyGeo, skyMat );
-//   scene.add( sky );
 
 	cloth = new Sheet(new THREE.Vector3(0,0,0))
 	cloth.init_mesh()
@@ -82,35 +46,42 @@ function init(){
 let adaptiveTimestep = false
 let timestep = TIME_STEP
 let accumulator = 0
-let epsilom = 2
+let epsilom =0.5
 function update()
 {
 	accumulator +=	clock.getDelta()
 	while(accumulator>=timestep)
-	{
+	{					
+
 			accumulator-=timestep
-			if(adaptiveTimestep == true)
-			{
-				cloth2 = cloth.clone()
-				cloth2.update(timestep)
-				let diff = cloth2.diff
-				let newStep = epsilom/cloth2.maxv
-				if(diff>epsilom)
-				{
-					count = Math.floor(timestep/newStep)
-					while(count>0)
-					{
-						cloth.update(newStep)
-						count-=1
-					}
-				}
-				else{
-					cloth.update(timestep)
-				}
-			}
-		    else{
+			// if(adaptiveTimestep == true)
+			// {
+			// cloth2 = cloth.clone()
+			// cloth2.update(timestep)
+			// let diff = cloth2.diff
+			// if(diff>epsilom)
+			// {
+			// 	//console.log(diff)
+			// 	while(diff>epsilom)
+			// 	{
+			// 		timestep = timestep/2
+			// 		cloth2 = cloth.clone()
+			// 		cloth2.update(timestep)
+
+			// 		diff = cloth2.diff
+			// 	}
+
+			// 	cloth.update(timestep)
+			// }
+			// else{
+			// 	cloth.update(timestep)
+			// 	//timestep = timestep * 2
+			// }
+			// console.log(diff)
+			// }
+		    // else{
 				cloth.update(timestep)
-			}
+			//}
 	}
 	
 }
@@ -145,22 +116,22 @@ document.addEventListener("keydown", function (event) {
   
 	switch (event.key) {
 	  case "ArrowDown":
-	  	sphereCenter.add(new THREE.Vector3(0,0,5*timestep))
+	  	shapePosition.add(new THREE.Vector3(0,0,OBJECT_SPEED*timestep))
 	  break;
 	  case "ArrowUp":
-	 	 sphereCenter.add(new THREE.Vector3(0,0,-5*timestep))
+		shapePosition.add(new THREE.Vector3(0,0,-OBJECT_SPEED*timestep))
 	  break;
 	  case "ArrowLeft":
-	 	 sphereCenter.add(new THREE.Vector3(-5*timestep,0,0))
+		shapePosition.add(new THREE.Vector3(-OBJECT_SPEED*timestep,0,0))
 	  break;
 	  case "ArrowRight":
-	  	sphereCenter.add(new THREE.Vector3(5*timestep,0,0))
+		shapePosition.add(new THREE.Vector3(OBJECT_SPEED*timestep,0,0))
 	  break;
 	  case "q":
-	  	sphereCenter.add(new THREE.Vector3(0,5*timestep,0))
+		shapePosition.add(new THREE.Vector3(0,OBJECT_SPEED*timestep,0))
 	  break;
 	  case "a":
-		sphereCenter.add(new THREE.Vector3(0,-5*timestep,0))
+		shapePosition.add(new THREE.Vector3(0,-OBJECT_SPEED*timestep,0))
  	  break;
 	  default:
 		return; // Quit when this doesn't handle the key event.

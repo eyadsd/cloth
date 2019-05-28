@@ -11,6 +11,8 @@ class Cloth{
 		this.position = position.clone()
 		this.constraintIterations = 50
 		this.deformationConstraint = false
+		this.raycaster = new THREE.Raycaster();
+
 
 	}
 	init()
@@ -51,104 +53,83 @@ class Cloth{
 	
 			}
 		}
-			this.mesh.material.color.set(0xffffff)
 
-			this.sphere.material.color.set( 0xff0ff0 );
-			var raycaster = new THREE.Raycaster();
-			for (let i = 0; i < this.height; i++) {
-				for (let j = 0; j < this.width; j++) {
-					let raycastDirection = this.particle[i][j].velocity.clone().normalize()
-					raycaster.set(this.particle[i][j].position,raycastDirection)
-					let intersects = raycaster.intersectObject(this.sphere);
-					for ( var k = 0; k < intersects.length; k++ ) {
-						if(intersects[k].distance<0.05)
-						{
-							intersects[ k ].object.material.color.set( 0xff0000 );
-							//this.Response(this.particle[i][j],intersects[k].face.normal,intersects[k].distance)
-							let direction = intersects[k].face.normal
-							this.particle[i][j].addForce(Forces.Fspring(this.particle[i][j].position,intersects[k].point,0.05,600))
-							this.particle[i][j].addPosition(this.particle[i][j].velocity.clone().multiplyScalar(-1).normalize().multiplyScalar(0.05-intersects[k].distance))
-							// let vn = direction.clone().multiplyScalar(direction.clone().dot(this.particle[i][j].velocity))
-							// let vt = this.particle[i][j].velocity.clone().sub(vn)
-							// this.particle[i][j].velocity = vt.clone().sub(vn.clone().multiplyScalar(0))
+			//collision detection
+			if(shape){
+
+			if(shape.geometry.type == "SphereGeometry")
+			{
+				for (let i = 0; i < this.height; i++)
+				{
+					for (let j = 0; j <this.width; j++)
+					{
+						let position = this.particle[i][j].position.clone()
+						let velocity = this.particle[i][j].velocity.clone()
+					    let radius = sphereRadius
+						let center = shapePosition.clone()
+						let direction = position.clone().sub(center).normalize()
+						let distance =  position.distanceTo(center)
+						if( distance < radius){
+							let newPosition = direction.clone().multiplyScalar(radius).add(center)
+							this.particle[i][j].position = newPosition.clone()
+							let vn = direction.clone().multiplyScalar(direction.clone().dot(velocity))
+							let vt = velocity.clone().sub(vn)
+							this.particle[i][j].velocity = vt.clone()
+						 }
+	
+					
+					
+					}
+	
+				}
+			}
+			else
+			{
+				for (let i = 0; i < this.height; i++) {
+					for (let j = 0; j < this.width; j++) {
+						let raycastDirection = this.particle[i][j].velocity.clone().normalize()
+						this.raycaster.set(this.particle[i][j].position,raycastDirection)
+						let intersects = this.raycaster.intersectObject(shape);
+						let position = this.particle[i][j].position.clone()
+						let velocity = this.particle[i][j].velocity.clone()
+						if (intersects.length > 0) {
+						   var intersection  = intersects[0];
+								if(intersection.distance<0.05)
+								{
+									//let direction = intersection.face.normal
+									this.particle[i][j].addForce(Forces.Fspring(position,intersection.point,0.05,600))
+									this.particle[i][j].addPosition(velocity.normalize().multiplyScalar((0.05-intersection.distance)*-1))
+	
+									// let vn = direction.clone().multiplyScalar(direction.clone().dot(this.particle[i][j].velocity))
+									// let vt = this.particle[i][j].velocity.clone().sub(vn)
+									// this.particle[i][j].velocity = vt.clone().sub(vn.clone().multiplyScalar(0))
+	
+								}
 							
 						}
-				
 					}
-					
 				}
 			}
-
-			// for(let i = 0;i<this.cube.geometry.vertices.length;i++)
-			// {
-			// 	raycaster.set(this.cube.position,this.cube.geometry.vertices[i].clone().normalize())
-			// 	//var arrowHelper = new THREE.ArrowHelper( this.cube.geometry.vertices[i].clone().normalize(), this.cube.position, 2, 0xffff00 );
-			// 	//scene.add( arrowHelper );
-			// 	//console.log(this.cube.geometry.vertices[i].length())
-
-			// 	var intersects = raycaster.intersectObjects( scene.children );
-			// 	for ( var k = 0; k < intersects.length; k++ ) {
-			// 		if(intersects[k].distance<this.cube.geometry.vertices[i].length())
-			// 			{
-			// 				//intersects[k].object.material.color.set( 0xff0000 );
-			// 				// let direction = intersects[k].face.normal
-			// 			// 	this.particle[i][j].addPosition(this.particle[i][j].velocity.clone().multiplyScalar(-1).normalize().multiplyScalar(0.1-intersects[k].distance))
-			// 			// 	let vn = direction.clone().multiplyScalar(direction.clone().dot(this.particle[i][j].velocity))
-			// 			// 	let vt = this.particle[i][j].velocity.clone().sub(vn)
-			// 			// 	this.particle[i][j].velocity = vt.clone().sub(vn.clone().multiplyScalar(0.8))
-			// 			 }
 			
-			// 	}
-			
-
-			// }
+		}
 		
-		// for (let i = 0; i < this.height; i++)
-		// 	{
-		// 	for (let j = 0; j <this.width; j++)
-		// 		{
-	
-		// 			let radius = 0.5
-		// 			let position = sphereCenter
-		// 			let direction = this.particle[i][j].position.clone().sub(position).normalize()
-		// 			let distance =  this.particle[i][j].position.distanceTo(position)
-		// 			let velocity = this.particle[i][j].velocity
-		// 			if( distance < radius){
-		// 				let newPosition = direction.clone().multiplyScalar(radius).add(position)
-		// 				this.particle[i][j].position = newPosition.clone()
-		// 				let vn = direction.clone().multiplyScalar(direction.clone().dot(velocity))
-		// 				let vt = velocity.clone().sub(vn)
-		// 				this.particle[i][j].velocity = vt.clone()
-		// 			 }
-	
-					
-					
-		// 		}
-	
-		// 	}
-
-	
-		let maxDiff = 0
+		
+		//let maxDiff = 0
 		for (let i = 0; i < this.height; i++) {
-			for (let j = 0; j < this.width; j++) {
-				this.particle[i][j].update(timestep)
-				if(adaptiveTimestep == true)
-			{
-				let diff = 	this.particle[i][j].position.distanceTo(this.particle[i][j].previousPosition)
-
-				if(diff > maxDiff)
-				{
-					maxDiff = diff
-					this.maxv = this.particle[i][j].velocity.length()
-
-				}
-				
-			}
 			
+			for (let j = 0; j < this.width; j++) {
+			
+				this.particle[i][j].update(timestep)
+			
+			//let diff = 	this.particle[i][j].velocity.length() * timestep
+			// if(diff>maxDiff)
+			// {
+			// 	maxDiff = diff
+			// }
+			//console.log(this.particle[i][j].velocity)
 			}
 		}
-		this.diff = maxDiff
-
+		//this.diff = maxDiff
 	}
 	// Response(particle,normal,distance){
 	// 	let direction = normal
@@ -159,23 +140,32 @@ class Cloth{
 	// }
 	render()
 	{	
-
-		this.sphere.position.setX(sphereCenter.x)
-		this.sphere.position.setZ(sphereCenter.z)
-		this.sphere.position.setY(sphereCenter.y)
+		if(shape)
+		{
+			shape.position.setX(shapePosition.x)
+			shape.position.setZ(shapePosition.z)
+			shape.position.setY(shapePosition.y)
+		}
+		
 
 		
 		for (let i = 0; i < this.height; i++) {
 			for (let j = 0; j < this.width; j++) {
 				
 					this.mesh.geometry.vertices[i * this.width + j] = this.particle[i][j].position;
-						
-					
+					if(this.particle[i][j].position.y < -4.9)
+					{
+						this.particle[i][j].position.setY(-4.9)
+						let direction = new THREE.Vector3(0, 1, 0)
+						let vn = direction.clone().multiplyScalar(direction.clone().dot(this.particle[i][j].velocity))
+		 				let vt =this.particle[i][j].velocity.clone().sub(vn)
+		 				this.particle[i][j].velocity = vt.clone()
+					}
 			}
 		}
 	
 			
-	
+		
 			this.mesh.geometry.computeFaceNormals();
 			this.mesh.geometry.computeVertexNormals();
 	
@@ -232,7 +222,7 @@ class Cloth{
                         this.particle[i][j].addForce(Forces.gravity(this.particle[i][j].mass))
 
 						//drag force	
-                        this.particle[i][j].addForce(this.particle[i][j].velocity.clone().normalize().multiplyScalar(-0.1));
+                        this.particle[i][j].addForce(this.particle[i][j].velocity.clone().normalize().multiplyScalar(-DRAG));
 						
 						if(wind == true)
 						{
@@ -357,19 +347,12 @@ class Cloth{
 		
 		scene.add(this.mesh)
 		
-		var geometry = new THREE.SphereGeometry(0.45, 32, 32);
-		var material = new THREE.MeshLambertMaterial({
-			color:0x0000f0
-		})
+	
 		
-		//this.sphere = new THREE.Mesh( geometry, material );
-		//scene.add( this.sphere );
-		const radius = 0.5;
-		geometry = new THREE.IcosahedronBufferGeometry(radius);
-		var material = new THREE.MeshLambertMaterial( {color: 0x00ff00} );
 
-		this.sphere = new THREE.Mesh(geometry,material)
-		scene.add(this.sphere)		
+		
+
+		
 		}
 	clone(){
 		let newCloth = new Cloth(this.position)
@@ -383,7 +366,6 @@ class Cloth{
 		}
 		newCloth.particle = particle
 		newCloth.mesh = this.mesh.clone()
-		newCloth.sphere = this.sphere.clone()
 		newCloth.addSprings()
 		return newCloth
 	}

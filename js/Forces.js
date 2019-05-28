@@ -7,7 +7,7 @@ class Forces{
         let stretch = xCurrent - xRest;
 				//console.log()
 		
-        return  direction.clone().multiplyScalar( -1 *  K *stretch)
+        return  direction.multiplyScalar( -1 *  K *stretch)
     }
 
     static gravity(mass)
